@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Gizem, Sana Bir Sorum Var… 💌</title>
+  <meta name="description" content="Gizem için özel hazırlanmış, romantik ve eğlenceli sürpriz bir buluşma teklifi.">
+  <meta name="theme-color" content="#0d091a">
+
+  <!-- Google Fonts: Dancing Script (El yazısı) & Poppins (Modern okunabilir sans-serif) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Canvas Confetti CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Arka plan animasyonu (Canvas: kayan yıldızlar & süzülen kalpler) -->
+  <canvas id="bg-canvas"></canvas>
+
+  <!-- Müzik Aç/Kapat Butonu -->
+  <button id="music-toggle" class="floating-control-btn" title="Müziği Başlat / Durdur" aria-label="Müzik Kontrolü">
+    <span class="music-icon" id="music-icon">🎵</span>
+    <span class="music-text">Müzik</span>
+    <span class="music-wave" id="music-wave"></span>
+  </button>
+  <audio id="bg-music" loop preload="none">
+    <source src="assets/music.mp3" type="audio/mpeg">
+  </audio>
+
+  <!-- Üst Sayaç / Eğlenceli Durum Bildirimi (Hayır kaçtıkça güncellenir) -->
+  <div id="counter-banner" class="counter-banner hidden">
+    <span class="counter-badge">
+      <span class="counter-icon">🎯</span>
+      <span id="counter-text">Hayır'a basma denemesi: 0</span>
+    </span>
+    <p id="counter-reaction" class="counter-reaction">Kaçamazsın, şansını zorlama! 😉</p>
+  </div>
+
+  <!-- Ana Kart Kapsayıcısı -->
+  <main class="main-container">
+    <section class="glass-card" id="proposal-card">
+
+      <!-- ================= 1. ADIM: SORU EKRANI ================= -->
+      <div id="question-screen" class="screen-view active-view">
+        <div class="card-badge">
+          <span class="badge-icon">💌</span>
+          <span class="badge-text">Sana Özel Bir Mesaj</span>
+        </div>
+
+        <h1 class="card-title">Gizem, sana bir sorum var…</h1>
+
+        <!-- Daktilo Metni -->
+        <div class="typewriter-container">
+          <p id="typewriter-text" class="typewriter-text"></p>
+          <span class="typing-cursor"></span>
+        </div>
+
+        <!-- Asıl Soru (Daktilo bitince belirir) -->
+        <div id="main-question-box" class="main-question-box hidden-opacity">
+          <h2 class="question-title">Benimle buluşur musun? 🥺</h2>
+          <p class="question-subtitle">Birlikte kahve içelim, biraz gülelim, harika vakit geçirelim mi?</p>
+
+          <!-- Butonlar Grubu -->
+          <div class="buttons-wrapper" id="buttons-wrapper">
+            <button id="btn-yes" class="btn btn-yes" type="button">
+              <span class="btn-sparkle">✨</span>
+              <span class="btn-text">Evet! 💖</span>
+              <span class="btn-pulse-glow"></span>
+            </button>
+
+            <button id="btn-no" class="btn btn-no" type="button">
+              <span class="btn-text" id="btn-no-text">Hayır</span>
+            </button>
+          </div>
+
+          <!-- Hayır butonu kaybolunca çıkacak espri mesajı -->
+          <div id="no-disappeared-msg" class="no-disappeared-msg hidden">
+            <span>🕊️ Hayır butonu bu hayatta bulunamadı... Başka şansın kalmadı!</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= 2. ADIM: KUTLAMA VE PLANLAMA EKRANI ================= -->
+      <div id="celebration-screen" class="screen-view hidden">
+        <div class="celebration-header">
+          <div class="heart-pulse-icon">💖</div>
+          <h1 class="celebration-title">YESSS! Biliyordum! 🎉🥳</h1>
+          <p class="celebration-subtitle">Gizem, seninle buluşmak için sabırsızlanıyorum ✨</p>
+        </div>
+
+        <!-- Buluşma Planlama Formu -->
+        <div class="planner-box">
+          <h3 class="planner-heading">Nerede ve ne zaman buluşalım? ☕🥂</h3>
+
+          <!-- Aktivite Seçenekleri (Chips - Çoklu Seçim, Maksimum 2) -->
+          <div class="activity-section">
+            <label class="section-label">Aktivite Seç (En fazla 2 tane):</label>
+            <div class="chips-grid" id="activity-chips">
+              <button type="button" class="chip active" data-activity="Kahve & Tatlı">
+                <span class="chip-icon">☕</span>
+                <span class="chip-name">Kahve & Tatlı</span>
+              </button>
+              <button type="button" class="chip" data-activity="Akşam Sahil Yürüyüşü">
+                <span class="chip-icon">🌅</span>
+                <span class="chip-name">Akşam Sahil Yürüyüşü</span>
+              </button>
+              <button type="button" class="chip" data-activity="Sen Seç Sürpriz Olsun">
+                <span class="chip-icon">✨</span>
+                <span class="chip-name">Sen Seç Sürpriz Olsun</span>
+              </button>
+            </div>
+            <p id="chip-warning" class="chip-warning hidden">En fazla 2 tane seçebilirsin 😄</p>
+          </div>
+
+          <!-- Tarih ve Saat Seçimi -->
+          <div class="datetime-section">
+            <label for="meetup-datetime" class="section-label">Tarih & Saat Seç:</label>
+            <div class="input-wrapper">
+              <input type="datetime-local" id="meetup-datetime" class="styled-datetime-input">
+            </div>
+          </div>
+
+          <!-- Opsiyonel Not -->
+          <div class="note-section">
+            <label for="meetup-note" class="section-label">Küçük Bir Not (Opsiyonel):</label>
+            <input type="text" id="meetup-note" class="styled-text-input" placeholder="Örn: 'En sevdiğim tatlıcıya gidelim!'">
+          </div>
+
+          <!-- WhatsApp ile Gönder Butonu -->
+          <button id="btn-send-whatsapp" class="btn btn-whatsapp" type="button">
+            <span class="wa-icon">💬</span>
+            <span class="wa-text">Planı Gönder 💌</span>
+          </button>
+          <p class="wa-hint">Butona basınca WhatsApp'tan hazır mesajla iletebilirsin!</p>
+        </div>
+      </div>
+
+    </section>
+  </main>
+
+  <!-- Küçük Romantik Footer -->
+  <footer class="page-footer">
+    <span>Gizem için sevgiyle hazırlandı 💫</span>
+  </footer>
+
+  <script src="script.js?v=2.1"></script>
+</body>
+</html>

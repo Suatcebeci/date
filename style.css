@@ -1,0 +1,739 @@
+/* ==========================================================================
+   GİZEM İÇİN ROMANTİK BULUŞMA TEKLİFİ - STİL DOSYASI
+   Tasarım: Gece mavisi / mor-pembe gradient, glassmorphism, 60fps akıcı animasyonlar
+   ========================================================================== */
+
+:root {
+  /* Renk Paleti */
+  --bg-dark-1: #090514;
+  --bg-dark-2: #160a2c;
+  --bg-dark-3: #2a1145;
+  --bg-dark-4: #12071f;
+
+  --accent-pink: #ff4b72;
+  --accent-pink-hover: #ff2a57;
+  --accent-rose: #ff758c;
+  --accent-purple: #9b51e0;
+  --accent-gold: #ffc048;
+  --accent-green: #25d366; /* WhatsApp yeşili */
+
+  /* Glassmorphism Efektleri */
+  --glass-bg: rgba(255, 255, 255, 0.07);
+  --glass-bg-hover: rgba(255, 255, 255, 0.12);
+  --glass-border: rgba(255, 255, 255, 0.16);
+  --glass-shadow: 0 16px 40px rgba(0, 0, 0, 0.5), 0 0 30px rgba(255, 75, 114, 0.15);
+
+  /* Tipografi */
+  --font-script: 'Dancing Script', cursive;
+  --font-sans: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  /* Metin Renkleri */
+  --text-main: #ffffff;
+  --text-muted: rgba(255, 255, 255, 0.78);
+  --text-soft: rgba(255, 255, 255, 0.55);
+
+  /* Animasyon Zamanlamaları */
+  --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-escape: 0.28s cubic-bezier(0.2, 0.9, 0.3, 1.2);
+}
+
+/* Sıfırlama & Temel Ayarlar */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  width: 100%;
+  min-height: 100%;
+  min-height: 100dvh;
+  overflow-x: hidden;
+  font-family: var(--font-sans);
+  background-color: var(--bg-dark-1);
+  color: var(--text-main);
+  background: radial-gradient(circle at 50% 20%, var(--bg-dark-3) 0%, var(--bg-dark-2) 45%, var(--bg-dark-1) 100%);
+  background-attachment: fixed;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Canvas Arka Planı (Yıldızlar ve Kalpler) */
+#bg-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ==========================================================================
+   MÜZİK AÇ/KAPAT KONTROL BUTONU (SAĞ ÜST)
+   ========================================================================== */
+.floating-control-btn {
+  position: fixed;
+  top: 18px;
+  right: 18px;
+  z-index: 50;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 15px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: 30px;
+  color: var(--text-main);
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+}
+
+.floating-control-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.music-wave {
+  width: 8px;
+  height: 8px;
+  background-color: var(--text-soft);
+  border-radius: 50%;
+  display: inline-block;
+  transition: all var(--transition-fast);
+}
+
+.floating-control-btn.playing .music-wave {
+  background-color: var(--accent-pink);
+  box-shadow: 0 0 10px var(--accent-pink);
+  animation: wavePulse 1s infinite alternate;
+}
+
+@keyframes wavePulse {
+  0% { transform: scale(0.8); opacity: 0.6; }
+  100% { transform: scale(1.4); opacity: 1; }
+}
+
+/* ==========================================================================
+   ÜST SAYAÇ & TEPKİ BİLDİRİMİ (HAYIR KAÇTIKÇA)
+   ========================================================================== */
+.counter-banner {
+  position: fixed;
+  top: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: rgba(18, 10, 32, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 75, 114, 0.35);
+  padding: 8px 18px;
+  border-radius: 20px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4), 0 0 15px rgba(255, 75, 114, 0.2);
+  animation: slideDownToast 0.4s ease-out;
+  max-width: 90vw;
+  text-align: center;
+}
+
+.counter-banner.hidden {
+  display: none;
+}
+
+.counter-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--accent-gold);
+}
+
+.counter-reaction {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+@keyframes slideDownToast {
+  0% { transform: translate(-50%, -20px); opacity: 0; }
+  100% { transform: translate(-50%, 0); opacity: 1; }
+}
+
+/* ==========================================================================
+   ANA TAŞIYICI VE GLASSMORPHISM KART
+   ========================================================================== */
+.main-container {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 580px;
+  margin: auto;
+  padding: 75px 18px 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.glass-card {
+  width: 100%;
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: 28px;
+  padding: 38px 28px;
+  box-shadow: var(--glass-shadow);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  animation: cardFadeIn 0.85s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.glass-card::before {
+  content: '';
+  position: absolute;
+  top: -60%;
+  left: -40%;
+  width: 180%;
+  height: 180%;
+  background: radial-gradient(circle, rgba(255, 117, 140, 0.12) 0%, transparent 60%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes cardFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(35px) scale(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.screen-view {
+  position: relative;
+  z-index: 2;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.screen-view.hidden {
+  display: none;
+  opacity: 0;
+}
+
+/* Üst Rozet */
+.card-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(255, 75, 114, 0.15);
+  border: 1px solid rgba(255, 75, 114, 0.35);
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--accent-rose);
+  margin-bottom: 16px;
+}
+
+/* Başlıklar */
+.card-title {
+  font-family: var(--font-script);
+  font-size: 2.35rem;
+  font-weight: 700;
+  line-height: 1.25;
+  color: #fff;
+  text-shadow: 0 2px 14px rgba(255, 75, 114, 0.45);
+  margin-bottom: 18px;
+}
+
+/* Daktilo Efekti */
+.typewriter-container {
+  min-height: 54px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+  padding: 0 10px;
+}
+
+.typewriter-text {
+  font-size: 1.05rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+  font-weight: 400;
+  display: inline;
+}
+
+.typing-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1.15rem;
+  background-color: var(--accent-pink);
+  margin-left: 3px;
+  vertical-align: middle;
+  animation: blinkCursor 0.75s infinite;
+}
+
+.typing-cursor.hide {
+  display: none;
+}
+
+@keyframes blinkCursor {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* Asıl Soru Kutusu */
+.main-question-box {
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.main-question-box.hidden-opacity {
+  opacity: 0;
+  transform: translateY(15px);
+  pointer-events: none;
+}
+
+.main-question-box.revealed {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.question-title {
+  font-size: 1.7rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 8px;
+  letter-spacing: -0.02em;
+}
+
+.question-subtitle {
+  font-size: 0.92rem;
+  color: var(--text-muted);
+  margin-bottom: 30px;
+  font-weight: 300;
+}
+
+/* Buton Grubu */
+.buttons-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  min-height: 70px;
+  margin: 10px 0 15px;
+}
+
+/* Genel Buton Stili */
+.btn {
+  position: relative;
+  border: none;
+  outline: none;
+  border-radius: 50px;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  transition: transform var(--transition-normal), box-shadow var(--transition-normal);
+}
+
+/* EVET BUTONU */
+.btn-yes {
+  background: linear-gradient(135deg, var(--accent-pink) 0%, var(--accent-rose) 50%, var(--accent-purple) 100%);
+  color: #ffffff;
+  font-size: 1.15rem;
+  padding: 16px 36px;
+  box-shadow: 0 8px 24px rgba(255, 75, 114, 0.45);
+  z-index: 15;
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
+  animation: yesHeartbeat 2.4s ease-in-out infinite;
+}
+
+.btn-yes:hover {
+  transform: scale(1.06);
+  box-shadow: 0 12px 30px rgba(255, 75, 114, 0.65), 0 0 20px rgba(255, 117, 140, 0.5);
+}
+
+.btn-yes:active {
+  transform: scale(0.98);
+}
+
+@keyframes yesHeartbeat {
+  0% { transform: scale(1); }
+  14% { transform: scale(1.05); }
+  28% { transform: scale(1); }
+  42% { transform: scale(1.07); }
+  70% { transform: scale(1); }
+  100% { transform: scale(1); }
+}
+
+/* HAYIR BUTONU */
+.btn-no {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--text-muted);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  font-size: 0.98rem;
+  padding: 14px 28px;
+  z-index: 20;
+  transition: transform var(--transition-escape), opacity var(--transition-normal), background-color var(--transition-fast);
+  will-change: transform, left, top;
+}
+
+.btn-no.is-escaping {
+  position: fixed !important;
+  margin: 0 !important;
+  z-index: 999 !important;
+}
+
+.btn-no.disappearing {
+  transform: scale(0) !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Hayır butonu kaybolunca mesaj */
+.no-disappeared-msg {
+  margin-top: 20px;
+  font-size: 0.88rem;
+  color: var(--accent-gold);
+  background: rgba(255, 192, 72, 0.12);
+  border: 1px dashed rgba(255, 192, 72, 0.4);
+  padding: 10px 16px;
+  border-radius: 12px;
+  animation: fadeInNotice 0.5s ease-out;
+}
+
+.no-disappeared-msg.hidden {
+  display: none;
+}
+
+@keyframes fadeInNotice {
+  0% { opacity: 0; transform: translateY(8px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* ==========================================================================
+   2. ADIM: KUTLAMA VE BULUŞMA PLANI
+   ========================================================================== */
+.celebration-header {
+  margin-bottom: 24px;
+}
+
+.heart-pulse-icon {
+  font-size: 3.5rem;
+  display: inline-block;
+  animation: heartPop 0.8s ease-in-out infinite alternate;
+  filter: drop-shadow(0 0 18px rgba(255, 75, 114, 0.6));
+  margin-bottom: 8px;
+}
+
+@keyframes heartPop {
+  0% { transform: scale(1) rotate(0deg); }
+  50% { transform: scale(1.18) rotate(-4deg); }
+  100% { transform: scale(1.28) rotate(4deg); }
+}
+
+.celebration-title {
+  font-family: var(--font-script);
+  font-size: 2.6rem;
+  color: #fff;
+  line-height: 1.2;
+  text-shadow: 0 0 20px rgba(255, 75, 114, 0.7);
+  margin-bottom: 8px;
+}
+
+.celebration-subtitle {
+  font-size: 1.05rem;
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+/* Planlama Formu */
+.planner-box {
+  background: rgba(0, 0, 0, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  padding: 24px 20px;
+  text-align: left;
+  margin-top: 15px;
+}
+
+.planner-heading {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 18px;
+  text-align: center;
+}
+
+.section-label {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Aktivite Çipleri (Chips) */
+.activity-section {
+  margin-bottom: 20px;
+}
+
+.chips-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 24px;
+  padding: 8px 14px;
+  color: var(--text-muted);
+  font-family: var(--font-sans);
+  font-size: 0.84rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.chip:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.chip.active {
+  background: linear-gradient(135deg, rgba(255, 75, 114, 0.38), rgba(155, 81, 224, 0.38));
+  border-color: var(--accent-pink);
+  color: #ffffff;
+  box-shadow: 0 0 16px rgba(255, 75, 114, 0.45), inset 0 0 8px rgba(255, 75, 114, 0.2);
+  font-weight: 600;
+  transform: translateY(-2px);
+}
+
+/* Çip Uyarı Mesajı (Maksimum 2 seçim) */
+.chip-warning {
+  margin-top: 10px;
+  font-size: 0.82rem;
+  color: var(--accent-gold);
+  background: rgba(255, 192, 72, 0.12);
+  border: 1px dashed rgba(255, 192, 72, 0.35);
+  padding: 6px 12px;
+  border-radius: 10px;
+  display: inline-block;
+  animation: shakeNotice 0.35s ease;
+}
+
+.chip-warning.hidden {
+  display: none;
+}
+
+@keyframes shakeNotice {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
+/* Tarih & Saat Girişi */
+.datetime-section {
+  margin-bottom: 18px;
+}
+
+.input-wrapper {
+  position: relative;
+}
+
+.styled-datetime-input,
+.styled-text-input {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 12px;
+  padding: 12px 14px;
+  color: #ffffff;
+  font-family: var(--font-sans);
+  font-size: 0.92rem;
+  outline: none;
+  transition: border-color var(--transition-fast), background-color var(--transition-fast);
+}
+
+.styled-datetime-input:focus,
+.styled-text-input:focus {
+  border-color: var(--accent-pink);
+  background: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 0 12px rgba(255, 75, 114, 0.25);
+}
+
+/* Takvim picker simgesi dark mod rengi */
+.styled-datetime-input::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  cursor: pointer;
+}
+
+.note-section {
+  margin-bottom: 22px;
+}
+
+/* WhatsApp Gönder Butonu */
+.btn-whatsapp {
+  width: 100%;
+  background: linear-gradient(135deg, #25d366 0%, #128c7e 100%);
+  color: #ffffff;
+  font-size: 1.05rem;
+  padding: 15px 24px;
+  border-radius: 14px;
+  box-shadow: 0 6px 20px rgba(37, 211, 102, 0.35);
+}
+
+.btn-whatsapp:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(37, 211, 102, 0.5);
+}
+
+.btn-whatsapp:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.btn-whatsapp:disabled {
+  opacity: 0.42;
+  cursor: not-allowed;
+  filter: grayscale(0.5);
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+.wa-icon {
+  font-size: 1.25rem;
+}
+
+.wa-hint {
+  text-align: center;
+  font-size: 0.76rem;
+  color: var(--text-soft);
+  margin-top: 10px;
+  transition: color var(--transition-fast);
+}
+
+.wa-hint.hint-disabled {
+  color: var(--accent-rose);
+  font-weight: 500;
+}
+
+/* Footer */
+.page-footer {
+  position: relative;
+  z-index: 10;
+  text-align: center;
+  padding: 16px;
+  font-size: 0.78rem;
+  color: var(--text-soft);
+}
+
+/* ==========================================================================
+   MOBİL VE TABLET UYUMLULUĞU (RESPONSIVE)
+   ========================================================================== */
+@media (max-width: 480px) {
+  .main-container {
+    padding: 70px 14px 20px;
+  }
+
+  .glass-card {
+    padding: 30px 18px;
+    border-radius: 22px;
+  }
+
+  .card-title {
+    font-size: 1.95rem;
+  }
+
+  .question-title {
+    font-size: 1.45rem;
+  }
+
+  .typewriter-text {
+    font-size: 0.95rem;
+  }
+
+  .buttons-wrapper {
+    gap: 12px;
+  }
+
+  .btn-yes {
+    font-size: 1.05rem;
+    padding: 14px 28px;
+  }
+
+  .btn-no {
+    font-size: 0.92rem;
+    padding: 13px 22px;
+  }
+
+  .celebration-title {
+    font-size: 2.1rem;
+  }
+
+  .planner-box {
+    padding: 18px 14px;
+  }
+
+  .floating-control-btn {
+    top: 12px;
+    right: 12px;
+    padding: 7px 12px;
+    font-size: 0.78rem;
+  }
+
+  .counter-banner {
+    top: 56px;
+    padding: 6px 14px;
+  }
+}
+
+/* ==========================================================================
+   PREFERS REDUCED MOTION (Harekete Duyarlı Kullanıcılar İçin)
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  /* Hayır butonu yine de kaçmalı */
+  .btn-no {
+    transition-duration: 0.15s !important;
+  }
+}
